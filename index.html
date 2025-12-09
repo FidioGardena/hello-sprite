@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Sprite Hello</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #020413;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #e0ffff;
+    }
+
+    .card {
+      position: relative;
+      width: 900px;
+      max-width: 100%;
+      height: 500px;
+      background: #050a1e;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      overflow: hidden;
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* “estrellitas” de fondo */
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.7) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    .top-bar {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .top-bar input {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #1f3b5b;
+      background: #02061a;
+      color: #e0ffff;
+      outline: none;
+    }
+
+    .top-bar button {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      background: #18e3b1;
+      color: #021019;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s;
+    }
+
+    .top-bar button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.4);
+      background: #0ac99a;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 8px 24px;
+    }
+
+    .text-block {
+      max-width: 60%;
+    }
+
+    .title {
+      font-family: "Consolas", monospace;
+      font-size: 42px;
+      color: #18e3b1;
+      margin-bottom: 8px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 1.2em;
+    }
+
+    .subtitle {
+      font-family: "Consolas", monospace;
+      font-size: 16px;
+      color: #ff4f7d;
+      letter-spacing: 0.08em;
+    }
+
+    .sprite-wrapper {
+      width: 220px;
+      height: 220px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .sprite-wrapper img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated; /* que se vea bien pixel art */
+    }
+
+    .footer-note {
+      position: relative;
+      z-index: 1;
+      font-size: 12px;
+      opacity: 0.6;
+      font-family: "Consolas", monospace;
+    }
+
+    @media (max-width: 700px) {
+      .content {
+        flex-direction: column;
+        justify-content: center;
+        gap: 24px;
+      }
+      .text-block {
+        max-width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="top-bar">
+      <input id="inputMessage" type="text"
+             placeholder="Escribe tu mensaje y pulsa &quot;Animar&quot;..." />
+      <button id="btnAnimate">Animar</button>
+    </div>
+
+    <div class="content">
+      <div class="text-block">
+        <div id="title" class="title"></div>
+        <div class="subtitle">LOOPING ANIMATION</div>
+      </div>
+
+      <div class="sprite-wrapper">
+        <img id="sprite" src="pose1.png" alt="sprite" />
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Escribe un mensaje arriba y mira la animación ✨
+    </div>
+  </div>
+
+  <script>
+    // ---- Configuración ----
+    const poses = [
+      "pose1.png",
+      "pose2.png",
+      "pose3.png",
+      "pose4.png",
+      "pose5.png"
+    ];
+
+    const TEXT_SPEED = 120;   // ms por letra
+    const HOLD_TIME = 2000;   // ms que el texto se queda completo antes de reiniciar
+    const SPRITE_INTERVAL = 150; // ms entre frames del personaje
+
+    const titleEl  = document.getElementById("title");
+    const spriteEl = document.getElementById("sprite");
+    const inputEl  = document.getElementById("inputMessage");
+    const btn      = document.getElementById("btnAnimate");
+
+    let currentMessage = "Hello World";
+    let charIndex = 0;
+    let textTimer = null;
+    let frameIndex = 0;
+
+    // ---- Animación de texto tipo "máquina de escribir" ----
+    function startTextAnimation(message) {
+      currentMessage = message || "Hello World";
+      charIndex = 0;
+      titleEl.textContent = "";
+
+      if (textTimer) clearTimeout(textTimer);
+      loopText();
+    }
+
+    function loopText() {
+      // escribir de a una letra
+      if (charIndex <= currentMessage.length) {
+        titleEl.textContent = currentMessage.slice(0, charIndex);
+        charIndex++;
+        textTimer = setTimeout(loopText, TEXT_SPEED);
+      } else {
+        // esperar un rato con el texto completo y reiniciar
+        setTimeout(() => {
+          charIndex = 0;
+          titleEl.textContent = "";
+          loopText();
+        }, HOLD_TIME);
+      }
+    }
+
+    // ---- Animación del sprite (cambiar de imagen en loop) ----
+    setInterval(() => {
+      frameIndex = (frameIndex + 1) % poses.length;
+      spriteEl.src = poses[frameIndex];
+    }, SPRITE_INTERVAL);
+
+    // ---- Evento del botón ----
+    btn.addEventListener("click", () => {
+      const msg = inputEl.value.trim();
+      startTextAnimation(msg);
+    });
+
+    // Enter también dispara el botón
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const msg = inputEl.value.trim();
+        startTextAnimation(msg);
+      }
+    });
+
+    // Iniciar con el mensaje por defecto
+    startTextAnimation(currentMessage);
+  </script>
+</body>
+</html>
