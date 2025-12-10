@@ -113,19 +113,21 @@
       letter-spacing: 0.08em;
     }
 
-    .sprite-wrapper {
-      width: 220px;
-      height: 220px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-    }
+  .sprite-wrapper {
+    width: 320px;          /* antes 220 */
+    height: 320px;         /* antes 220 */
+    display: flex;
+    align-items: center;   /* centrado vertical */
+    justify-content: center;
+  }
+  
+  /* agrandamos explícitamente la imagen */
+  .sprite-wrapper img {
+    width: 260px;          /* prueba 260–300 según te guste */
+    height: auto;
+    image-rendering: pixelated;  /* mantiene el estilo pixel art */
+  }
 
-    .sprite-wrapper img {
-      max-width: 100%;
-      max-height: 100%;
-      image-rendering: pixelated; /* que se vea bien pixel art */
-    }
 
     .footer-note {
       position: relative;
@@ -247,3 +249,4 @@
   </script>
 </body>
 </html>
+
